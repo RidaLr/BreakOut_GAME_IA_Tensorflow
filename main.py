@@ -2,12 +2,12 @@
 """
 Created on Mon Oct 12 11:51:54 2020
 
-@author: Rida LAKSIR
+@author: Rida
 """
 
-#Manage the imports
 import pygame
 import math
+import sys
 from player import Player
 from ball import Ball
 from game import Game
@@ -19,15 +19,11 @@ pygame.init()
 
 
 # Create graphic interface 
-
 pygame.display.set_caption("BreakOut Game")
 screen = pygame.display.set_mode((1080, 620))
 
-# white color  
-color = (255,255,255) 
-
 #import the background of our game
-background = pygame.image.load('assets/bg_3.png')
+background = pygame.image.load('assets/bg.jpg')
 
 #import the play button
 play_button = pygame.image.load('assets/start.png')
@@ -35,7 +31,7 @@ play_button_rect = play_button.get_rect()
 play_button_rect.x = math.ceil(screen.get_width() / 2.55)
 play_button_rect.y = math.ceil(screen.get_height() / 2)
 
-# create a surface object, logo is drawn on it. 
+# create a surface object for the logo image 
 logo = pygame.image.load('assets/logo.png') 
 
 # stores the width of the screen into a variable called width  
@@ -47,66 +43,51 @@ height = screen.get_height()
 #Load player
 player = Player()
 
+#Load bricks
+brick1 = Brick('assets/brick_1.jpg')
+brick2 = Brick('assets/brick_2.jpg')
+brick3 = Brick('assets/brick_3.jpg')
+brick4 = Brick('assets/brick_4.jpg')
+brick5 = Brick('assets/brick_5.jpg')
+brick6 = Brick('assets/brick_6.jpg')
+brick7 = Brick('assets/brick_7.jpg')
+brick8 = Brick('assets/brick_8.jpg')
+brick9 = Brick('assets/brick_9.jpg')
+
+#A list of bricks objects
+brick_list = []
+
+#Add all the bricks into this list
+brick_list.append(brick1)
+brick_list.append(brick2)
+brick_list.append(brick3)
+brick_list.append(brick4)
+brick_list.append(brick5)
+brick_list.append(brick6)
+brick_list.append(brick7)
+brick_list.append(brick8)
+brick_list.append(brick9)
+    
+    
+#Paddle
+paddle = Paddle()
+
+#Ball
+ball = Ball()
+
+#This will be a list that will contain all the sprites we intend to use in our game.
+sprites_list = pygame.sprite.Group()
+ 
+bricks = pygame.sprite.Group()
+       
 #Load game party
 game = Game()
 
-#Load ball
-ball = Ball()
+#Draw the objects 
+sprites_list = game.draw(bricks ,brick_list, ball, paddle)
 
-#Load brick
-brick = Brick()
 
-#Load paddle
-paddle = Paddle()
-
-running = True
-
-while running:
-    
-    
-    # if the game not started yet we show those images
-    screen.blit(background, (0, 0))
-    screen.blit(logo, (345, 150))
-    screen.blit(play_button, play_button_rect)
-    screen.blit(game.ball.image, game.ball.rect)
-    screen.blit(game.brick.image, game.brick.rect)
-    screen.blit(game.paddle.image, game.paddle.rect)
-    
-    # else we will show the game interface and desable those images
-    
-    
-    
-    
-    
-    
-    
-    pygame.display.flip()
-        
-    # stores the (x,y) coordinates into a tuple  
-    mouse = pygame.mouse.get_pos() 
-    
-    #check if the mouse is clicked on the quit button in the quit button of the window
-    for event in pygame.event.get():
-        if(event.type == pygame.QUIT):
-            running == False
-            pygame.quit()
-    
-        #checks if a mouse is clicked  
-        if event.type == pygame.MOUSEBUTTONDOWN:  
-              
-            #if the mouse is clicked on the Play button the game will start  
-            if (play_button_rect.collidepoint(event.pos)):
-                #Start the game
-                #game.is_playing = True
-                print("start the game")
-                
-        #check if the player touch a key button
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RIGHT:
-                game.paddle.move_right()
-            if event.key == pygame.K_LEFT:
-                game.paddle.move_left()
-                
-    
-    # updates the frames of the game  
-    pygame.display.update() 
+#The main
+if __name__ == '__main__':
+    game.run(screen, background, sprites_list, logo, play_button, play_button_rect, paddle, ball, bricks)
+   
