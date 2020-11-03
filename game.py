@@ -44,7 +44,7 @@ class Game:
     def win_game(self, screen):
         
         font = pygame.font.Font(None, 74)
-        game_over = font.render("You win the game", 1, (255, 255, 255))
+        game_over = font.render("You won the game", 1, (255, 255, 255))
         screen.blit(game_over, (250,300))
         
         
@@ -132,14 +132,17 @@ class Game:
                   ball.rebound()
                   self.player.score += 1
                   brick.kill()
-                  if len(all_bricks)==0:
-                        #Display 'you won the game' message
-                        self.win_game(screen)
-                        pygame.display.flip()
-                        # Wait 5 seconds before closing the game
-                        pygame.time.wait(5000)
-                        #Stop the Game
-                        running=False
+                  
+                # Check if there is no bricks
+                if len(all_bricks)==0:
+                      print(len(all_bricks))
+                      #Display 'you won the game' message
+                      self.win_game(screen)
+                      pygame.display.flip()
+                      # Wait 5 seconds before closing the game
+                      pygame.time.wait(5000)
+                      #Stop the Game
+                      running=False
                 
                 # Draw the score
                 self.score(screen)
