@@ -157,7 +157,7 @@ class Game:
                 self.draw_menu(screen, logo, play_button, play_button_rect)
             
             pygame.display.flip()
-            pygame.key.set_repeat(10,40)
+            pygame.key.set_repeat(1,1)
                 
             #check if the mouse is clicked on the quit button in the quit button of the window
             for event in pygame.event.get():
