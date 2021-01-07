@@ -7,20 +7,24 @@ Created on Wed Oct 14 21:18:27 2020
 import pygame
 import math
 import random
-
+import numpy as np
 from ball import Ball
 from brick import Brick
 from paddle import Paddle
 from player import Player
+from ai import Ai
 
 class Game:
     
     def __init__(self):
         # Call the parent class (Sprite) constructor
-        self.is_playing = False  
+        self.is_playing = False
+        self.is_playing_tensorflow = False
         self.ball = Ball()
         self.paddle = Paddle()
         self.player = Player()
+        self.robotron3000 = Ai(self)
+        self.epsilon = 1
         
     
     def score(self, screen):
@@ -48,9 +52,10 @@ class Game:
         screen.blit(game_over, (250,300))
         
         
-    def draw_menu(self, screen, logo, play_button, play_button_rect):
+    def draw_menu(self, screen, logo, play_button, play_button_rect,play_button_tensorflow,play_button_rect2):
         screen.blit(logo, (345, 150))
         screen.blit(play_button, play_button_rect)
+        screen.blit(play_button_tensorflow,play_button_rect2)
 
     def draw(self,all_bricks, brick_list, ball, paddle):
         
@@ -81,11 +86,40 @@ class Game:
         pygame.mixer.music.load("assets/music/ctr_ingame.mp3")
         pygame.mixer.music.set_volume(0.4)
         pygame.mixer.music.play(-1)
-        
-    def run(self, screen, background, all_sprites_list, logo, play_button, play_button_rect, paddle, ball, all_bricks):
+
+    def prepare_data(self, data_hash):
+        array = list(data_hash.values())[:3]
+        numpy_array = np.array(array)
+        return numpy_array
+
+    def update_epsilon(self):
+        if self.epsilon > 0.1:
+            self.epsilon -= 0.00001
+
+    def get_reward(self):
+        if self.player.lives - self.player.old_lives > 0:
+            reward = -700
+            self.player.old_lives = dict(self.player.lives)
+        elif self.ball.rect.colliderect(self.paddle):
+            reward = 700
+            self.player.old_lives = dict(self.player.lives)
+        else:
+            reward = 0
+        return reward
+
+    def output_data(self):
+        output = {"r": self.paddle.rect.x,
+                  "bx": self.ball.rect.x,
+                  "by": self.ball.rect.y,
+                  "score": self.player.lives}
+        return output
+
+    def run(self, screen, background, all_sprites_list, logo, play_button, play_button_rect,play_button_tensorflow,play_button_rect2, paddle, ball, all_bricks):
         running = True
-        self.play_music()
+        #self.play_music()
         action = -1
+        is_starting = True
+        
         while running:
             
             #stores the (x,y) coordinates into a tuple  
@@ -106,6 +140,7 @@ class Game:
                 if ball.rect.x<=0:
                     ball.velocity[0] = -ball.velocity[0]
                 if ball.rect.y>580:
+                    is_starting = True
                     ball.velocity[1] = -ball.velocity[1]
                     self.player.lives -= 1
                     if self.player.lives == 0:
@@ -150,11 +185,83 @@ class Game:
                 self.lives(screen)
                 
                 # updates the frames of the game  
-                pygame.display.update() 
+                pygame.display.update()
                 
+                # wait to press space key to launch the game
+                while is_starting:
+                    event = pygame.event.wait()
+                    if event.type == pygame.KEYDOWN:
+                        is_starting = False
+                        continue
+
+            # else we will show the game interface and desable those images
+            elif self.is_playing_tensorflow:
+                self.robotron3000.receive_state(self.prepare_data(self.output_data()), self.epsilon)
+                all_sprites_list.draw(screen)
+                all_sprites_list.update()
+
+                #Check if the ball is rebounding against any of the 4 walls:
+                if ball.rect.x>=1040:
+                    ball.velocity[0] = -ball.velocity[0]
+                if ball.rect.x<=0:
+                    ball.velocity[0] = -ball.velocity[0]
+                if ball.rect.y>580:
+                    ball.velocity[1] = -ball.velocity[1]
+                    self.player.lives -= 1
+                    if self.player.lives == 0:
+                        #Display Game Over Message
+                        self.game_over(screen)
+                        pygame.display.flip()
+                        # Wait 5 seconds before closing the game
+                        pygame.time.wait(5000)
+                        #Stop the Game
+                        #self.robotron3000.model.save('test.h5')
+                        running = False
+
+                if ball.rect.y<40:
+                    ball.velocity[1] = -ball.velocity[1]
+
+                #Detect collisions between the ball and the paddle
+                if pygame.sprite.collide_mask(ball, paddle):
+                  ball.rect.x -= ball.velocity[0]
+                  ball.rect.y -= ball.velocity[1]
+                  ball.rebound()
+
+                # Detect the collisions between the ball and the bricks
+                brick_collision_list = pygame.sprite.spritecollide(ball,all_bricks,False)
+                for brick in brick_collision_list:
+                  ball.rebound()
+                  self.player.score += 1
+                  brick.kill()
+
+                # Check if there is no bricks
+                if len(all_bricks)==0:
+                      print(len(all_bricks))
+                      #Display 'you won the game' message
+                      self.win_game(screen)
+                      pygame.display.flip()
+                      # Wait 5 seconds before closing the game
+                      pygame.time.wait(5000)
+                      #Stop the Game
+                      running=False
+
+                # Draw the score
+                self.score(screen)
+                # Draw the lives
+                self.lives(screen)
+
+                self.robotron3000.update_state(self.prepare_data(self.output_data()))
+                print(self.output_data())
+                print("PaddleX : ", self.paddle.rect.x)
+                print("PaddleY : ", self.paddle.rect.y)
+
+                # updates the frames of the game
+                pygame.display.update()
+                    
+           
                 # The game is not already started, show the menu  
             else:
-                self.draw_menu(screen, logo, play_button, play_button_rect)
+                self.draw_menu(screen, logo, play_button, play_button_rect,play_button_tensorflow,play_button_rect2)
             
             pygame.display.flip()
             pygame.key.set_repeat(1,1)
@@ -163,6 +270,7 @@ class Game:
             for event in pygame.event.get():
                 if(event.type == pygame.QUIT):
                     running == False
+                    # self.robotron3000.model.save('test.h5')
                     pygame.quit()
             
                 #checks if a mouse is clicked  
@@ -172,14 +280,19 @@ class Game:
                     if (play_button_rect.collidepoint(event.pos)):
                         #Start the game
                         self.is_playing = True
+
+                    if (play_button_rect2.collidepoint(event.pos)):
+                        #Start the game
+                        self.is_playing_tensorflow = True
                         
                 #check if the player touch a key button
                 elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.is_playing = False
+                        self.is_playing_tensorflow = False
                     if event.key == pygame.K_RIGHT:
                         paddle.move_right()
                     if event.key == pygame.K_LEFT:
                         paddle.move_left()
-                        
-            
-        
+
         pygame.quit()

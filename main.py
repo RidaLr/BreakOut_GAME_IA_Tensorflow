@@ -5,15 +5,14 @@ Created on Mon Oct 12 11:51:54 2020
 @author: Rida
 """
 
-import pygame
 import math
-import sys
-from player import Player
+import pygame
+
 from ball import Ball
+from brick import Brick
 from game import Game
 from paddle import Paddle
-from brick import Brick
-
+from player import Player
 
 pygame.init()
 
@@ -30,6 +29,12 @@ play_button = pygame.image.load('assets/start.png')
 play_button_rect = play_button.get_rect()
 play_button_rect.x = math.ceil(screen.get_width() / 2.55)
 play_button_rect.y = math.ceil(screen.get_height() / 2)
+
+#import the play button
+play_button_tensorflow = pygame.image.load('assets/start_tensorflow.png')
+play_button_rect2 = play_button_tensorflow.get_rect()
+play_button_rect2.x = math.ceil(screen.get_width() / 2.55)
+play_button_rect2.y = math.ceil(screen.get_height() / 1.5)
 
 # create a surface object for the logo image 
 logo = pygame.image.load('assets/logo.png') 
@@ -89,5 +94,5 @@ sprites_list = game.draw(bricks ,brick_list, ball, paddle)
 
 #The main
 if __name__ == '__main__':
-    game.run(screen, background, sprites_list, logo, play_button, play_button_rect, paddle, ball, bricks)
+    game.run(screen, background, sprites_list, logo, play_button, play_button_rect,play_button_tensorflow,play_button_rect2, paddle, ball, bricks)
    

@@ -14,7 +14,7 @@ class Paddle(pygame.sprite.Sprite):
     def __init__(self):
 
         super().__init__()
-        self.velocity = 180
+        self.velocity = 2
         self.image = pygame.image.load('assets/paddle.png')      
         self.rect = self.image.get_rect()
         self.rect.x = 510

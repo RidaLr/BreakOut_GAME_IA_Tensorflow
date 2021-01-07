@@ -19,7 +19,7 @@ class Ball(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.radius = 10
         # Game speed    
-        self.speed = 8
+        self.speed = 4
         self.velocity = [randint(4,8),randint(-8,8)]
         self.rect = self.image.get_rect()
         self.rect.x = 540
