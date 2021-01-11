@@ -119,6 +119,8 @@ class Game:
         #self.play_music()
         action = -1
         is_starting = True
+        self.ball = ball
+        self.paddle = paddle
         
         while running:
             
@@ -135,14 +137,19 @@ class Game:
                 all_sprites_list.update()
                 
                 #Check if the ball is rebounding against any of the 4 walls:
-                if ball.rect.x>=1040:
-                    ball.velocity[0] = -ball.velocity[0]
-                if ball.rect.x<=0:
-                    ball.velocity[0] = -ball.velocity[0]
-                if ball.rect.y>580:
+                if self.ball.rect.x>=1040:
+                    self.ball.velocity[0] = -self.ball.velocity[0]
+                if self.ball.rect.x<=0:
+                    self.ball.velocity[0] = -self.ball.velocity[0]
+                if self.ball.rect.y>580:
                     is_starting = True
-                    ball.velocity[1] = -ball.velocity[1]
+                    self.ball.rect.x = 540
+                    self.ball.rect.y = 550
+                    self.paddle.rect.x = 510
+                    self.paddle.rect.y = 580
+
                     self.player.lives -= 1
+
                     if self.player.lives == 0:
                         #Display Game Over Message
                         self.game_over(screen)
@@ -152,19 +159,19 @@ class Game:
                         #Stop the Game
                         running = False
                 
-                if ball.rect.y<40:
-                    ball.velocity[1] = -ball.velocity[1]
+                if self.ball.rect.y<40:
+                    self.ball.velocity[1] = -self.ball.velocity[1]
             
                 #Detect collisions between the ball and the paddle
-                if pygame.sprite.collide_mask(ball, paddle):
-                  ball.rect.x -= ball.velocity[0]
-                  ball.rect.y -= ball.velocity[1]
-                  ball.rebound()
+                if pygame.sprite.collide_mask(self.ball, self.paddle):
+                  self.ball.rect.x -= self.ball.velocity[0]
+                  self.ball.rect.y -= self.ball.velocity[1]
+                  self.ball.rebound()
                      
                 # Detect the collisions between the ball and the bricks 
-                brick_collision_list = pygame.sprite.spritecollide(ball,all_bricks,False)
+                brick_collision_list = pygame.sprite.spritecollide(self.ball,all_bricks,False)
                 for brick in brick_collision_list:
-                  ball.rebound()
+                  self.ball.rebound()
                   self.player.score += 1
                   brick.kill()
                   
@@ -186,7 +193,7 @@ class Game:
                 
                 # updates the frames of the game  
                 pygame.display.update()
-                
+
                 # wait to press space key to launch the game
                 while is_starting:
                     event = pygame.event.wait()
@@ -201,12 +208,12 @@ class Game:
                 all_sprites_list.update()
 
                 #Check if the ball is rebounding against any of the 4 walls:
-                if ball.rect.x>=1040:
-                    ball.velocity[0] = -ball.velocity[0]
-                if ball.rect.x<=0:
-                    ball.velocity[0] = -ball.velocity[0]
-                if ball.rect.y>580:
-                    ball.velocity[1] = -ball.velocity[1]
+                if self.ball.rect.x>=1040:
+                    self.ball.velocity[0] = -self.ball.velocity[0]
+                if self.ball.rect.x<=0:
+                    self.ball.velocity[0] = -self.ball.velocity[0]
+                if self.ball.rect.y>580:
+                    self.ball.velocity[1] = -self.ball.velocity[1]
                     self.player.lives -= 1
                     if self.player.lives == 0:
                         #Display Game Over Message
@@ -218,19 +225,19 @@ class Game:
                         #self.robotron3000.model.save('test.h5')
                         running = False
 
-                if ball.rect.y<40:
-                    ball.velocity[1] = -ball.velocity[1]
+                if self.ball.rect.y<40:
+                    self.ball.velocity[1] = -self.ball.velocity[1]
 
                 #Detect collisions between the ball and the paddle
-                if pygame.sprite.collide_mask(ball, paddle):
-                  ball.rect.x -= ball.velocity[0]
-                  ball.rect.y -= ball.velocity[1]
-                  ball.rebound()
+                if pygame.sprite.collide_mask(self.ball, paddle):
+                  self.ball.rect.x -= self.ball.velocity[0]
+                  self.ball.rect.y -= self.ball.velocity[1]
+                  self.ball.rebound()
 
                 # Detect the collisions between the ball and the bricks
-                brick_collision_list = pygame.sprite.spritecollide(ball,all_bricks,False)
+                brick_collision_list = pygame.sprite.spritecollide(self.ball,all_bricks,False)
                 for brick in brick_collision_list:
-                  ball.rebound()
+                  self.ball.rebound()
                   self.player.score += 1
                   brick.kill()
 
@@ -291,8 +298,8 @@ class Game:
                         self.is_playing = False
                         self.is_playing_tensorflow = False
                     if event.key == pygame.K_RIGHT:
-                        paddle.move_right()
+                        self.paddle.move_right()
                     if event.key == pygame.K_LEFT:
-                        paddle.move_left()
+                        self.paddle.move_left()
 
         pygame.quit()
