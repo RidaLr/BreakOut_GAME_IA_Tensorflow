@@ -14,6 +14,7 @@ class Brick(pygame.sprite.Sprite):
      
         super().__init__()
         # Set the brick image
+        self.incassable = 0
         self.image_src = image_brick
-        self.image = pygame.image.load(image_brick) 
+        self.image = pygame.image.load(image_brick)
         self.rect = self.image.get_rect()

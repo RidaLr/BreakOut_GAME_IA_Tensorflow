@@ -63,14 +63,34 @@ class Game:
       
         y = 60
         for obj in brick_list:
-    
             for i in range(14):
-                
-                brick = Brick(obj.image_src)
-                brick.rect.x = 10 + i* 75
+                rand = random.randint(1, 9)
+                if rand==1:
+                    brick = Brick('assets/brick_1.jpg')
+                elif rand==2:
+                    brick = Brick('assets/brick_2.jpg')
+                elif rand==3:
+                    brick = Brick('assets/brick_3.jpg')
+                elif rand==4:
+                    brick = Brick('assets/brick_4.jpg')
+                elif rand==5:
+                    brick = Brick('assets/brick_5.jpg')
+                elif rand==6:
+                    brick = Brick('assets/brick_6.jpg')
+                elif rand==7:
+                    brick = Brick('assets/brick_7.jpg')
+                elif rand==8:
+                    brick = Brick('assets/brick_8.jpg')
+                elif rand==9:
+                    brick = Brick('assets/brick_9.jpg')
+                brick.rect.x = 10 + i * 75
                 brick.rect.y = y
+                if brick.image_src=='assets/brick_1.jpg':
+                    brick.incassable=1
+
                 all_sprites_list.add(brick)
                 all_bricks.add(brick)
+
                
             y += 27
              
@@ -99,10 +119,10 @@ class Game:
     def get_reward(self):
         if self.player.lives - self.player.old_lives > 0:
             reward = -700
-            self.player.old_lives = dict(self.player.lives)
+            self.player.old_lives = self.player.lives
         elif self.ball.rect.colliderect(self.paddle):
             reward = 700
-            self.player.old_lives = dict(self.player.lives)
+            self.player.old_lives = self.player.lives
         else:
             reward = 0
         return reward
@@ -132,6 +152,7 @@ class Game:
             
             # else we will show the game interface and desable those images
             if self.is_playing :
+
                 print("is player true")
                 all_sprites_list.draw(screen)
                 all_sprites_list.update()
@@ -142,13 +163,14 @@ class Game:
                 if self.ball.rect.x<=0:
                     self.ball.velocity[0] = -self.ball.velocity[0]
                 if self.ball.rect.y>580:
-                    is_starting = True
+
                     self.ball.rect.x = 540
                     self.ball.rect.y = 550
                     self.paddle.rect.x = 510
                     self.paddle.rect.y = 580
 
                     self.player.lives -= 1
+                    is_starting = True
 
                     if self.player.lives == 0:
                         #Display Game Over Message
@@ -171,10 +193,15 @@ class Game:
                 # Detect the collisions between the ball and the bricks 
                 brick_collision_list = pygame.sprite.spritecollide(self.ball,all_bricks,False)
                 for brick in brick_collision_list:
-                  self.ball.rebound()
-                  self.player.score += 1
-                  brick.kill()
-                  
+
+                  if brick.incassable==0 :
+                    self.ball.rebound()
+                    self.player.score += 1
+                    brick.kill()
+                  else :
+                    self.ball.rebound()
+
+
                 # Check if there is no bricks
                 if len(all_bricks)==0:
                       print(len(all_bricks))
@@ -196,6 +223,7 @@ class Game:
 
                 # wait to press space key to launch the game
                 while is_starting:
+                    pygame.display.update()
                     event = pygame.event.wait()
                     if event.type == pygame.KEYDOWN:
                         is_starting = False
@@ -203,6 +231,7 @@ class Game:
 
             # else we will show the game interface and desable those images
             elif self.is_playing_tensorflow:
+                self.player.lives=1000
                 self.robotron3000.receive_state(self.prepare_data(self.output_data()), self.epsilon)
                 all_sprites_list.draw(screen)
                 all_sprites_list.update()

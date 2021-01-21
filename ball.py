@@ -19,8 +19,8 @@ class Ball(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.radius = 10
         # Game speed    
-        self.speed = 4
-        self.velocity = [randint(4,8),randint(-8,8)]
+        self.speed = 2
+        self.velocity = [randint(2,2),randint(-2,2)]
         self.rect = self.image.get_rect()
         self.rect.x = 540
         self.rect.y = 550
@@ -28,9 +28,19 @@ class Ball(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.velocity[0]
         self.rect.y += self.velocity[1]
-       
+
+        if (self.rect.y + self.velocity[1]) == self.rect.y:
+            if self.rect.y>30:
+                self.rect.y-=2
+
+        print("balle y = ",self.rect.y)
+
           
     def rebound(self):
         self.velocity[0] = -self.velocity[0]
-        self.velocity[1] = randint(-8,8)
+        x = randint(-2, 2)
+        if x != 0:
+            self.velocity[1] = x
+
+        #self.velocity[1] = randint(-2,2)
 
