@@ -13,6 +13,7 @@ from brick import Brick
 from paddle import Paddle
 from player import Player
 from ai import Ai
+from random import randint
 
 class Game:
     
@@ -152,7 +153,7 @@ class Game:
             
             # else we will show the game interface and desable those images
             if self.is_playing :
-
+                self.paddle.velocity = 2
                 print("is player true")
                 all_sprites_list.draw(screen)
                 all_sprites_list.update()
@@ -201,7 +202,6 @@ class Game:
                   else :
                     self.ball.rebound()
 
-
                 # Check if there is no bricks
                 if len(all_bricks)==0:
                       print(len(all_bricks))
@@ -231,8 +231,9 @@ class Game:
 
             # else we will show the game interface and desable those images
             elif self.is_playing_tensorflow:
-                self.player.lives=1000
+                self.paddle.velocity = 50
                 self.robotron3000.receive_state(self.prepare_data(self.output_data()), self.epsilon)
+
                 all_sprites_list.draw(screen)
                 all_sprites_list.update()
 
@@ -251,7 +252,7 @@ class Game:
                         # Wait 5 seconds before closing the game
                         pygame.time.wait(5000)
                         #Stop the Game
-                        #self.robotron3000.model.save('test.h5')
+                        self.robotron3000.model.save('test.h5')
                         running = False
 
                 if self.ball.rect.y<40:
@@ -266,9 +267,12 @@ class Game:
                 # Detect the collisions between the ball and the bricks
                 brick_collision_list = pygame.sprite.spritecollide(self.ball,all_bricks,False)
                 for brick in brick_collision_list:
-                  self.ball.rebound()
-                  self.player.score += 1
-                  brick.kill()
+                    if brick.incassable == 0:
+                        self.ball.rebound()
+                        self.player.score += 1
+                        brick.kill()
+                    else:
+                        self.ball.rebound()
 
                 # Check if there is no bricks
                 if len(all_bricks)==0:
@@ -276,6 +280,8 @@ class Game:
                       #Display 'you won the game' message
                       self.win_game(screen)
                       pygame.display.flip()
+                      # save the model
+                      self.robotron3000.model.save('test.h5')
                       # Wait 5 seconds before closing the game
                       pygame.time.wait(5000)
                       #Stop the Game
@@ -287,9 +293,9 @@ class Game:
                 self.lives(screen)
 
                 self.robotron3000.update_state(self.prepare_data(self.output_data()))
-                print(self.output_data())
-                print("PaddleX : ", self.paddle.rect.x)
-                print("PaddleY : ", self.paddle.rect.y)
+                #print(self.output_data())
+                #print("PaddleX : ", self.paddle.rect.x)
+                #print("PaddleY : ", self.paddle.rect.y)
 
                 # updates the frames of the game
                 pygame.display.update()
@@ -306,7 +312,7 @@ class Game:
             for event in pygame.event.get():
                 if(event.type == pygame.QUIT):
                     running == False
-                    # self.robotron3000.model.save('test.h5')
+                    self.robotron3000.model.save('test.h5')
                     pygame.quit()
             
                 #checks if a mouse is clicked  
@@ -320,7 +326,7 @@ class Game:
                     if (play_button_rect2.collidepoint(event.pos)):
                         #Start the game
                         self.is_playing_tensorflow = True
-                        
+
                 #check if the player touch a key button
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -330,5 +336,6 @@ class Game:
                         self.paddle.move_right()
                     if event.key == pygame.K_LEFT:
                         self.paddle.move_left()
+
 
         pygame.quit()

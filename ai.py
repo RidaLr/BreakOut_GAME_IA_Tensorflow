@@ -38,7 +38,7 @@ class Ai:
             self.action = (np.argmax(self.qval))
         # Take an action now based on the above
         self.take_action(self.action)
-        print(f"Qval is {self.qval}")
+        #print(f"Qval is {self.qval}")
 
 
     def update_state(self, state):
@@ -64,9 +64,9 @@ class Ai:
         y_val[0][self.action] = update
         # Update the model based on this
         self.model.fit(state.reshape(1, 3), y_val, batch_size=10, epochs=1, verbose=1)
-        print(f"Yval is {y_val}")
-        print(update)
-        print('-' * 50)
+        #print(f"Yval is {y_val}")
+        #print(update)
+        #print('-' * 50)
 
     def take_action(self, action):
         if action == 0:
