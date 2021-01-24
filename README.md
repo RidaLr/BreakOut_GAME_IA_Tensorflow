@@ -18,11 +18,16 @@
 ## Dependencies:
 ```
 - numpy==1.16.2
-- tensorflow
+- tensorflow==2.4.0
+- tensorboard==2.4.1
 - gym[all]
 - opencv-python
 - matplotlib==2.2.0
-- Keras
+- Keras==2.4.3
+- random
+- pygame==2.0
+- pydot
+- pydotplus
   
 -GUI-
 - Pygame
@@ -38,6 +43,20 @@ conda create -n tensorflow_gpuenv tensorflow-gpu
 conda activate tensorflow_gpuenv
 
 To install the package and all dependencies on ANACONDA IDE:
+
+```
+git clone https://github.com/RidaLr/BreakOut_GAME_IA_Tensorflow.git
+conda install -f requirements.yml
+pip install -e .
+```
+
+----
+
+## Visualisation Tensorboard 
+
+tensorboard --logdir=tensorflow/logdir/
+
+Then open on a browser the link : http://localhost:6006/ to visualize the data.
 
 ```
 git clone https://github.com/RidaLr/BreakOut_GAME_IA_Tensorflow.git
