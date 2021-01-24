@@ -1,0 +1,7 @@
+numpy==1.16.2
+tensorflow
+gym[all]
+opencv-python
+matplotlib==2.2.0
+Keras
+Pygame
