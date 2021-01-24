@@ -54,7 +54,7 @@ pip install -e .
 
 ## Visualisation Tensorboard 
 
-tensorboard --logdir=tensorflow/logdir/
+tensorboard --logdir=tensorflow/logdir/ in a terminal
 
 Then open on a browser the link : http://localhost:6006/ to visualize the data.
 
