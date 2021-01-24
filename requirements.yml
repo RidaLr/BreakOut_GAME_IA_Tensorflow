@@ -1,7 +1,10 @@
 numpy==1.16.2
-tensorflow
+tensorflow==2.4.1
 gym[all]
 opencv-python
 matplotlib==2.2.0
-Keras
-Pygame
+Keras==2.4.3
+Pygame==2.0
+pydot==1.4.1
+pydotplus==2.0.2
+graphviz=0.16
