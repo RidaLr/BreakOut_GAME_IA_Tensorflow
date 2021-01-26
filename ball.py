@@ -34,13 +34,19 @@ class Ball(pygame.sprite.Sprite):
                 self.rect.y-=2
 
         print("balle y = ",self.rect.y)
+        print("velocity y = ", self.velocity[1])
 
           
     def rebound(self):
         self.velocity[0] = -self.velocity[0]
         x = randint(-2, 2)
-        if x != 0:
-            self.velocity[1] = x
+        while True:
+            x = randint(-2, 2)
+            if x != 0:
+                self.velocity[1] = x
+                break
+
+
 
         #self.velocity[1] = randint(-2,2)
 

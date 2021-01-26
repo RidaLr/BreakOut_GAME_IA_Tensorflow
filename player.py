@@ -11,6 +11,6 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         # Call the parent class (Sprite) constructor
         super().__init__()
-        self.lives = 10
-        self.old_lives = 10
+        self.lives = 10000
+        self.old_lives = 10000
         self.score = 0

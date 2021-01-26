@@ -4,16 +4,26 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers.core import Dense, Activation
 from keras.optimizers import RMSprop
+from tensorflow.keras.callbacks import TensorBoard
 
 
 class Ai:
 
     def __init__(self, game):
+        self.NAME = "Test2"
+        self.tensorboard = TensorBoard(log_dir="tensorflow/logdir/{}".format(self.NAME), histogram_freq=0,
+                                       write_graph=True,
+                                       write_images=False,
+                                       update_freq="epoch",
+                                       profile_batch=2,
+                                       embeddings_freq=0,
+                                       embeddings_metadata=None
+                                       )
         self.game = game
         self.gamma = 0.9
         self.game_over = 0
         self.model = Sequential()
-        self.model.add(Dense(150, kernel_initializer='lecun_uniform', input_shape=(3,)))
+        self.model.add(Dense(150, kernel_initializer='lecun_uniform'))
         self.model.add(Activation('relu'))
         self.model.add(Dense(168, kernel_initializer='lecun_uniform'))
         self.model.add(Activation('relu'))
@@ -26,7 +36,7 @@ class Ai:
 
     def receive_state(self, state, epsilon):
         # Set up qval by adding current state to the model
-        self.qval = self.model.predict(state.reshape(1, 3), batch_size=1)
+        self.qval = self.model.predict(state.reshape(1, 3), batch_size=1, callbacks=[self.tensorboard])
         # We set an epsilon - an ever decreasing number
         # If a random number is less than the epsilon we do a random action
         # If greater we use the qval to decide the action
@@ -38,8 +48,7 @@ class Ai:
             self.action = (np.argmax(self.qval))
         # Take an action now based on the above
         self.take_action(self.action)
-        #print(f"Qval is {self.qval}")
-
+        print(f"Qval is {self.qval}")
 
     def update_state(self, state):
         # Now we check the reward for our action
@@ -63,14 +72,13 @@ class Ai:
         # Makes the qval based on the reward
         y_val[0][self.action] = update
         # Update the model based on this
-        self.model.fit(state.reshape(1, 3), y_val, batch_size=10, epochs=1, verbose=1)
-        #print(f"Yval is {y_val}")
-        #print(update)
-        #print('-' * 50)
+        self.model.fit(state.reshape(1, 3), y_val, batch_size=10, epochs=1, verbose=1, callbacks=[self.tensorboard])
+        print(f"Yval is {y_val}")
+        print(update)
+        print('-' * 50)
 
     def take_action(self, action):
         if action == 0:
             self.game.paddle.move_right()
         else:
             self.game.paddle.move_left()
-
